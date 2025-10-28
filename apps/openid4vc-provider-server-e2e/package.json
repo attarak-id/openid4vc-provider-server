@@ -1,0 +1,26 @@
+{
+  "name": "@openid4vc-provider-server/openid4vc-provider-server-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@openid4vc-provider-server/openid4vc-provider-server"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "apps/openid4vc-provider-server-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@openid4vc-provider-server/openid4vc-provider-server:build",
+          "@openid4vc-provider-server/openid4vc-provider-server:serve"
+        ]
+      }
+    }
+  }
+}
