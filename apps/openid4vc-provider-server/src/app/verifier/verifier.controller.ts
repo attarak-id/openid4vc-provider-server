@@ -1,18 +1,30 @@
-import { All, Controller, Next, Req, Res } from '@nestjs/common';
-import type { Request, Response, NextFunction } from 'express';
-import { AgentService } from '../agent/agent.service';
+import { Controller, Get } from "@nestjs/common";
+import { AgentService } from "../agent/agent.service";
 
-@Controller('siop')
+@Controller("verifier")
 export class VerifierController {
-  constructor(private readonly agentService: AgentService) {}
+    // private readonly logger = new Logger(IssuerController.name);
 
-  @All('*')
-  handleVerifierRequests(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Next() next: NextFunction,
-  ) {
-    const router = this.agentService.getVerifierRouter();
-    router(req, res, next);
-  }
+    constructor(private readonly agentService: AgentService) {}
+
+    // Test endpoint to check if controller is working
+    @Get('health')
+    health() {
+        return {
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            message: 'Verifier controller is running'
+        };
+    }
+
+    // Get agent info
+    @Get('agent-info')
+    async getAgentInfo() {
+        const agent = this.agentService.getAgent();
+        return {
+            label: agent.config.label,
+            isInitialized: agent.isInitialized,
+            agentId: agent.context.contextCorrelationId
+        };
+    }
 }

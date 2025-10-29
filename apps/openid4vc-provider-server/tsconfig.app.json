@@ -13,7 +13,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/app/agent/agentRouter.ts.bak", "src/app/agent/baseAgent.ts.bak"  ],
   "exclude": [
     "out-tsc",
     "dist",
