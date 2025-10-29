@@ -18,7 +18,7 @@ export class AgentService {
         this.verifierRouter = Router();
     }
 
-    async initialize() {
+    async onModuleInit() {
         this.agent = new Agent({
             config: {
                 label: "OpenID4VC Agent",
@@ -32,7 +32,7 @@ export class AgentService {
             modules: {
                 askar: new AskarModule({ariesAskar}),
                 openId4VcIssuer: new OpenId4VcIssuerModule({
-                    baseUrl: "http://127.0.0.1:3000/issuer/oid4vci",
+                    baseUrl: "http://127.0.0.1:3000/api/issuer/oid4vci",
                     router: this.issuerRouter,
                     endpoints: {
                         credential: {
@@ -43,7 +43,7 @@ export class AgentService {
                     },
                 }),
                 openId4VcVerifier: new OpenId4VcVerifierModule({
-                    baseUrl: "http://127.0.0.1:3000/verifier/siop",
+                    baseUrl: "http://127.0.0.1:3000/ai/verifier/siop",
                     router: this.verifierRouter,
                 }),
             },
