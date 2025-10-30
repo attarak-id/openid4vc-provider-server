@@ -1,22 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import { AgentService } from '../agent/agent.service'
-import type { Agent } from '@credo-ts/core'
+import {Injectable} from "@nestjs/common";
+import {AgentService} from "../agent/agent.service";
+import {OpenId4VcIssuerApi} from "@credo-ts/openid4vc";
 
 @Injectable()
 export class IssuerService {
   constructor(private readonly agentService: AgentService) {}
 
-  IssuerAgent(): Agent {
-    return this.agentService.getAgent()
+  private issuer(): OpenId4VcIssuerApi {
+    return this.agentService.getAgent().modules.openId4VcIssuer;
   }
 
-  async getAgentInfo() {
-    const agent = this.IssuerAgent()
-    // console.log(await agent.modules.openId4VcIssuer.getByIssuerId("1")); // just for test
-    return {
-      label: agent.config.label,
-      isInitialized: agent.isInitialized,
-      agentId: agent.context.contextCorrelationId,
-    }
+  async getAllIssuers() {
+    const issuers = await this.issuer().getAllIssuers();
+    return {issuers};
   }
+
+  // @TODO add other apis.
 }

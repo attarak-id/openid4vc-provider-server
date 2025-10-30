@@ -1,21 +1,19 @@
-import { Injectable } from '@nestjs/common'
-import { AgentService } from '../agent/agent.service'
-import type { Agent } from '@credo-ts/core'
+import {Injectable} from "@nestjs/common";
+import {AgentService} from "../agent/agent.service";
+import type {OpenId4VcVerifierApi} from "@credo-ts/openid4vc";
 
 @Injectable()
 export class VerifierService {
   constructor(private readonly agentService: AgentService) {}
 
-  verifierAgent(): Agent {
-    return this.agentService.getAgent()
+  private verifier(): OpenId4VcVerifierApi {
+    return this.agentService.getAgent().modules.openId4VcVerifier;
   }
 
-  async getAgentInfo() {
-    const agent = this.verifierAgent()
-    return {
-      label: agent.config.label,
-      isInitialized: agent.isInitialized,
-      agentId: agent.context.contextCorrelationId,
-    }
+  async getAllVerifiers() {
+    const verifiers = await this.verifier().getAllVerifiers();
+    return {verifiers};
   }
+
+  // @TODO add other apis.
 }
