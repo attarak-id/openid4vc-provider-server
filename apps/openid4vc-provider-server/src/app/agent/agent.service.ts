@@ -19,6 +19,12 @@ export class AgentService {
     }
 
     async onModuleInit() {
+        // @TODO configService 
+        // get BASE_URI_API from process.env.BASE_URI_API
+        // get LABEL from process.env.LABEL
+        // get WALLET_CONFIG_ID from process.env.WALLET_CONFIG_ID
+        // get WALLET_CONFIG_KEY from process.env.WALLET_CONFIG_WALLET
+        // @TODO add endpoints
         this.agent = new Agent({
             config: {
                 label: "OpenID4VC Agent",
@@ -26,13 +32,14 @@ export class AgentService {
                 walletConfig: {
                     id: "openid4vc-wallet",
                     key: "your-secret-key-here",
+                    // storage: "postgres" // postgres as preferred storage.
                 },
             },
             dependencies: agentDependencies,
             modules: {
                 askar: new AskarModule({ariesAskar}),
                 openId4VcIssuer: new OpenId4VcIssuerModule({
-                    baseUrl: "http://127.0.0.1:3000/api/issuer/oid4vci",
+                    baseUrl: `http:localhost:3000/api/issuer/oid4vci`,
                     router: this.issuerRouter,
                     endpoints: {
                         credential: {
@@ -43,7 +50,7 @@ export class AgentService {
                     },
                 }),
                 openId4VcVerifier: new OpenId4VcVerifierModule({
-                    baseUrl: "http://127.0.0.1:3000/ai/verifier/siop",
+                    baseUrl: `http:localhost:3000/api/verifier/siop`,
                     router: this.verifierRouter,
                 }),
             },

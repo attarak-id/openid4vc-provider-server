@@ -29,8 +29,8 @@ export class IssuerService {
   }
 
   // @TODO handling case 
-  // null not found
-  // found but multiples
+  // case null not found
+  // case found but multiples
   async getIssuerByIssuerId(issuerId: string) {
     return await this.agent.modules.openId4VcIssuer.getIssuerByIssuerId(issuerId);
   }
