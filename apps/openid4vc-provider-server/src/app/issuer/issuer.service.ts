@@ -28,8 +28,11 @@ export class IssuerService {
     return await this.issuerApi.getAllIssuers();
   }
 
+  // @TODO handling case 
+  // null not found
+  // found but multiples
   async getIssuerByIssuerId(issuerId: string) {
-    return await this.issuerApi.getIssuerByIssuerId(issuerId);
+    return await this.agent.modules.openId4VcIssuer.getIssuerByIssuerId(issuerId);
   }
 
   async getIssuerMetadata(issuerId: string) {
@@ -80,7 +83,7 @@ export class IssuerService {
   async createCredentialResponse(issuanceSessionId: string, options: OpenId4VciCreateCredentialResponseOptions) {
     return await this.issuerApi.createCredentialResponse({
       issuanceSessionId: issuanceSessionId,
-      ...options
+      ...options,
     });
   }
 }

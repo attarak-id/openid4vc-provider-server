@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Param, Delete} from "@nestjs/common";
+import {Controller, Get, Post, Body, Param, Delete, Res, HttpStatus} from "@nestjs/common";
 import {IssuerService} from "./issuer.service";
 import type {OpenId4VciCreateIssuerOptions} from "@credo-ts/openid4vc";
 
@@ -9,6 +9,16 @@ export class IssuerController {
   @Get("get-all-issuers")
   public async getAllIssuers() {
     return this.issuerService.getAllIssuers();
+  }
+
+  @Get(":id")
+  public async getIssuerByIssuerId(@Param('id') id:string, @Res() res: any) {
+    // try 
+    const issuerInfo= await this.issuerService.getIssuerByIssuerId(id);
+      return res.status(HttpStatus.OK).json(issuerInfo);
+    // } catch (error) {
+    //   return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "INTERNAL_SERVER_ERROR"});
+    // }
   }
 
   @Post()

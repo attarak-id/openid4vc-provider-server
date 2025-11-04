@@ -18,4 +18,8 @@ export class VerifierService {
   async getAllVerifiers() {
     return await this.verifierApi.getAllVerifiers();
   }
+
+  async getVerifierByVerifierId(verifierId: string) {
+    return await this.verifierApi.getVerifierByVerifierId(verifierId);
+  }
 }
