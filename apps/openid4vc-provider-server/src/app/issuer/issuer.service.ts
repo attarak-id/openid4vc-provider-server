@@ -1,4 +1,4 @@
-import {Injectable, Logger} from "@nestjs/common";
+import {ConflictException, Injectable, Logger} from "@nestjs/common";
 import {AgentService} from "../agent/agent.service";
 import {OpenId4VcIssuerRepository} from "@credo-ts/openid4vc/build/openid4vc-issuer/repository";
 import type {Agent} from "@credo-ts/core";
@@ -28,9 +28,7 @@ export class IssuerService {
     return await this.issuerApi.getAllIssuers();
   }
 
-  // @TODO handling case 
-  // case null not found
-  // case found but multiples
+  /** @TODO handling case */
   async getIssuerByIssuerId(issuerId: string) {
     return await this.agent.modules.openId4VcIssuer.getIssuerByIssuerId(issuerId);
   }
@@ -39,7 +37,7 @@ export class IssuerService {
     return await this.issuerApi.getIssuerMetadata(issuerId);
   }
 
-  // @TODO change from any to type strict.
+  /** @TODO change from any to type strict. */
   async updateIssuerMetadata(issuerId: string, issuerRecordProps: any): Promise<void> {
     await this.issuerApi.updateIssuerMetadata({
       issuerId: issuerId,
@@ -47,12 +45,23 @@ export class IssuerService {
     });
   }
 
-  // @TODO handling the options.
+  /** @TODO handling the options. */
   async createIssuer(createIssuerOption: OpenId4VciCreateIssuerOptions) {
+    const agent = this.agent;
+    const {issuerId} = createIssuerOption;
+    if (issuerId) {
+      const issuerRepository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
+      const issuerRecord = await issuerRepository.findByIssuerId(agent.context, issuerId);
+      if (issuerRecord) {
+        // create duplicate issuerId is not allowed.
+        Logger.error(`Failed to create issuerId:${issuerId} already exists.`);
+        throw new ConflictException(`Failed to create issuerId:${issuerId} already exists.`);
+      }
+    }
     return await this.issuerApi.createIssuer(createIssuerOption);
   }
 
-  // @TODO handling preventing deleting not existing.
+  /** @TODO handling preventing deleting not existing. */
   async deleteIssuer(issuerId: string): Promise<void> {
     const agent = this.agent;
     const repository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
@@ -63,7 +72,7 @@ export class IssuerService {
     return await this.issuerApi.rotateAccessTokenSigningKey(issuerId);
   }
 
-  // @TODO handling the options.
+  /** @TODO handling the options. */
   async findIssuanceSessionForCredentialRequest(credentialRequest: OpenId4VciCredentialRequest, issuerId?: string) {
     return await this.issuerApi.findIssuanceSessionForCredentialRequest({
       credentialRequest: credentialRequest,
@@ -71,7 +80,7 @@ export class IssuerService {
     });
   }
 
-  // @TODO handling the options.
+  /** @TODO handling the options.*/
   async createCredentialOffer(issuerId: string, options: OpenId4VciCreateCredentialOfferOptions) {
     return await this.issuerApi.createCredentialOffer({
       issuerId: issuerId,
@@ -79,7 +88,7 @@ export class IssuerService {
     });
   }
 
-  // @TODO handling the options.
+  /** @TODO handling the options.*/
   async createCredentialResponse(issuanceSessionId: string, options: OpenId4VciCreateCredentialResponseOptions) {
     return await this.issuerApi.createCredentialResponse({
       issuanceSessionId: issuanceSessionId,

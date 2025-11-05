@@ -1,23 +1,34 @@
-import {Controller, Get, Param, Res} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Res} from "@nestjs/common";
 import {VerifierService} from "./verifier.service";
 
-@Controller('verifier')
+@Controller("verifier")
 export class VerifierController {
   constructor(private readonly verifierService: VerifierService) {}
 
   @Get("get-all-verifiers")
   async getAllVerifiers() {
-    return this.verifierService.getAllVerifiers();
+    try {
+      return this.verifierService.getAllVerifiers();
+    } catch (error) {
+      throw error;
+    }
   }
 
-
   @Get(":id")
-  public async getVerifierByVerifierId(@Param("id") id: string, @Res() res: any) {
-    // try {
-    return await this.verifierService.getVerifierByVerifierId(id);
-      // return res.status(HttpStatus.OK).json(issuerInfo);
-    // } catch (error) {
-    //   return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "INTERNAL_SERVER_ERROR"});
-    // }
+  public async getVerifierByVerifierId(@Param("id") id: string) {
+    try {
+      return await this.verifierService.getVerifierByVerifierId(id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post()
+  public async createVerifier(@Body() verifierId?:string) {
+    try {
+      return await this.verifierService.createVerifier(verifierId);
+    } catch (error) {
+      throw error;
+    }
   }
 }

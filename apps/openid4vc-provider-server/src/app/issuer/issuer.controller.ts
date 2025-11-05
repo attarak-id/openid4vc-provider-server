@@ -12,13 +12,12 @@ export class IssuerController {
   }
 
   @Get(":id")
-  public async getIssuerByIssuerId(@Param('id') id:string, @Res() res: any) {
-    // try 
-    const issuerInfo= await this.issuerService.getIssuerByIssuerId(id);
-      return res.status(HttpStatus.OK).json(issuerInfo);
-    // } catch (error) {
-    //   return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: "INTERNAL_SERVER_ERROR"});
-    // }
+  public async getIssuerByIssuerId(@Param("id") id: string) {
+    try {
+      return await this.issuerService.getIssuerByIssuerId(id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post()
@@ -61,12 +60,16 @@ export class IssuerController {
 
       return await this.issuerService.createIssuer(testIssuerConfig);
     } catch (error) {
-      throw new Error("Failed to create issuer");
+      throw error;
     }
   }
 
   @Delete("delete-issuer/:issuerId")
   public async deleteIssuer(@Param("issuerId") issuerId: string) {
-    return this.issuerService.deleteIssuer(issuerId);
+    try {
+      return this.issuerService.deleteIssuer(issuerId);
+    } catch (error) {
+      throw error
+    }
   }
 }
