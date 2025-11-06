@@ -1,8 +1,18 @@
-import {Controller, Get, Post, Body, Param, Delete, Res, HttpStatus} from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+  NotFoundException,
+} from "@nestjs/common";
 import {IssuerService} from "./issuer.service";
 import type {OpenId4VciCreateIssuerOptions} from "@credo-ts/openid4vc";
+import {RecordNotFoundError} from "@credo-ts/core";
 
-@Controller("issuer")
+@Controller("oid4vc/issuer")
 export class IssuerController {
   constructor(private readonly issuerService: IssuerService) {}
 
@@ -12,10 +22,37 @@ export class IssuerController {
   }
 
   @Get(":id")
-  public async getIssuerByIssuerId(@Param("id") id: string) {
+  public async getIssuerByIssuerId(@Param("id") id?: string) {
     try {
       return await this.issuerService.getIssuerByIssuerId(id);
     } catch (error) {
+      if (error instanceof RecordNotFoundError) {
+        throw new NotFoundException(`issuerId:${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  @Get()
+  public async getIssuerByQueryIssuerId(@Query("id") id: string) {
+    try {
+      return await this.issuerService.getIssuerByIssuerId(id);
+    } catch (error) {
+      if (error instanceof RecordNotFoundError) {
+        throw new NotFoundException(`issuerId:${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  @Get(":id/metadata")
+  public async getIssuerMetadata(@Param("id") id: string) {
+    try {
+      return await this.issuerService.getIssuerMetadata(id);
+    } catch (error) {
+      if (error instanceof RecordNotFoundError) {
+        throw new NotFoundException(`issuerId:${id} not found`);
+      }
       throw error;
     }
   }
@@ -64,12 +101,12 @@ export class IssuerController {
     }
   }
 
-  @Delete("delete-issuer/:issuerId")
-  public async deleteIssuer(@Param("issuerId") issuerId: string) {
+  @Delete(":id")
+  public async deleteIssuer(@Param("id") id: string) {
     try {
-      return this.issuerService.deleteIssuer(issuerId);
+      return this.issuerService.deleteIssuer(id);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

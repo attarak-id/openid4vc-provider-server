@@ -1,10 +1,9 @@
-import {ConflictException, Injectable, Logger, NotImplementedException} from "@nestjs/common";
+import {BadRequestException, ConflictException, Injectable, Logger, NotImplementedException} from "@nestjs/common";
 import {AgentService} from "../agent/agent.service";
 import type {Agent} from "@credo-ts/core";
 import {
   OpenId4VcVerifierRepository,
   type OpenId4VcSiopCreateAuthorizationRequestOptions,
-  type OpenId4VcSiopCreateVerifierOptions,
   type OpenId4VcSiopVerifyAuthorizationResponseOptions,
   type OpenId4VcVerifierApi,
 } from "@credo-ts/openid4vc";
@@ -25,7 +24,13 @@ export class VerifierService {
     return await this.verifierApi.getAllVerifiers();
   }
 
-  async getVerifierByVerifierId(verifierId: string) {
+  async getVerifierByVerifierId(verifierId?: string) {
+    if (!verifierId) {
+      throw new BadRequestException({
+        message: "Missing required parameter",
+        parameter: "verifierId",
+      });
+    }
     return await this.verifierApi.getVerifierByVerifierId(verifierId);
   }
 
@@ -50,7 +55,7 @@ export class VerifierService {
     return await this.verifierApi.createAuthorizationRequest(createAuthorizationRequest);
   }
 
-  /** @TODO dto type */ 
+  /** @TODO dto type */
   async verifyAuthorizationResponse(
     verifyAuthorizationResponseOptions: OpenId4VcSiopVerifyAuthorizationResponseOptions & {
       verificationSessionId: string;

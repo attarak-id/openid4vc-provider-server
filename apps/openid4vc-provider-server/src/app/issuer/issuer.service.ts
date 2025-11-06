@@ -1,4 +1,4 @@
-import {ConflictException, Injectable, Logger} from "@nestjs/common";
+import {BadRequestException, ConflictException, Injectable, Logger, NotFoundException} from "@nestjs/common";
 import {AgentService} from "../agent/agent.service";
 import {OpenId4VcIssuerRepository} from "@credo-ts/openid4vc/build/openid4vc-issuer/repository";
 import type {Agent} from "@credo-ts/core";
@@ -12,7 +12,7 @@ import type {
 
 @Injectable()
 export class IssuerService {
-  // private readonly logger = new Logger(IssuerService.name);
+  private readonly logger = new Logger(IssuerService.name);
 
   constructor(private readonly agentService: AgentService) {}
 
@@ -28,9 +28,15 @@ export class IssuerService {
     return await this.issuerApi.getAllIssuers();
   }
 
-  /** @TODO handling case */
-  async getIssuerByIssuerId(issuerId: string) {
-    return await this.agent.modules.openId4VcIssuer.getIssuerByIssuerId(issuerId);
+  async getIssuerByIssuerId(issuerId?: string) {
+    if (!issuerId) {
+      this.logger.error(`Missing required parameter issuerId`);
+      throw new BadRequestException({
+        message: "Missing required parameter",
+        parameter: "issuerId",
+      });
+    }
+    return await this.issuerApi.getIssuerByIssuerId(issuerId);
   }
 
   async getIssuerMetadata(issuerId: string) {
@@ -49,23 +55,27 @@ export class IssuerService {
   async createIssuer(createIssuerOption: OpenId4VciCreateIssuerOptions) {
     const agent = this.agent;
     const {issuerId} = createIssuerOption;
-    if (issuerId) {
-      const issuerRepository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
-      const issuerRecord = await issuerRepository.findByIssuerId(agent.context, issuerId);
-      if (issuerRecord) {
-        // create duplicate issuerId is not allowed.
-        Logger.error(`Failed to create issuerId:${issuerId} already exists.`);
-        throw new ConflictException(`Failed to create issuerId:${issuerId} already exists.`);
-      }
+    if (!issuerId) {
+      return await this.agent.modules.openId4VcIssuer.createIssuer(createIssuerOption);
     }
-    return await this.issuerApi.createIssuer(createIssuerOption);
+    const issuerRepository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
+    const issuerRecord = await issuerRepository.findByIssuerId(agent.context, issuerId);
+    if (!issuerRecord) {
+      return await this.agent.modules.openId4VcIssuer.createIssuer(createIssuerOption);
+    }
+    this.logger.error(`Failed to create issuerId:${issuerId} already exists.`);
+    throw new ConflictException(`Failed to create issuerId:${issuerId} already exists.`);
   }
 
-  /** @TODO handling preventing deleting not existing. */
   async deleteIssuer(issuerId: string): Promise<void> {
     const agent = this.agent;
-    const repository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
-    await repository.deleteById(agent.context, issuerId);
+    const issuerRepository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
+    const issuerRecord = await issuerRepository.findByIssuerId(agent.context, issuerId);
+    if (!issuerRecord) {
+      this.logger.error(`Failed to delete not exist issuerId:${issuerId}.`);
+      throw new NotFoundException(`Failed to delete not exist issuerId:${issuerId}.`);
+    }
+    await issuerRepository.deleteById(agent.context, issuerRecord.id);
   }
 
   async rotateAccessTokenSigningKey(issuerId: string): Promise<void> {

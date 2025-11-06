@@ -1,7 +1,16 @@
-import {Body, Controller, Get, Param, Post, Res} from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+} from "@nestjs/common";
 import {VerifierService} from "./verifier.service";
+import {RecordNotFoundError} from "@credo-ts/core";
 
-@Controller("verifier")
+@Controller("oid4vc/verifier")
 export class VerifierController {
   constructor(private readonly verifierService: VerifierService) {}
 
@@ -19,12 +28,27 @@ export class VerifierController {
     try {
       return await this.verifierService.getVerifierByVerifierId(id);
     } catch (error) {
+      if (error instanceof RecordNotFoundError) {
+        throw new NotFoundException(`verifierId:${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  @Get()
+  public async getVerifierByQueryVerifierId(@Query("id") id: string) {
+    try {
+      return await this.verifierService.getVerifierByVerifierId(id);
+    } catch (error) {
+      if (error instanceof RecordNotFoundError) {
+        throw new NotFoundException(`verifierId:${id} not found`);
+      }
       throw error;
     }
   }
 
   @Post()
-  public async createVerifier(@Body() verifierId?:string) {
+  public async createVerifier(@Body() verifierId?: string) {
     try {
       return await this.verifierService.createVerifier(verifierId);
     } catch (error) {
