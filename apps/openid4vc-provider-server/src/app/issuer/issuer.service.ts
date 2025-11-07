@@ -26,12 +26,12 @@ export class IssuerService {
 
   /** getAllIssuers are not implemented cause get all can impact query performance if too many issuers record */
 
-  async getIssuersByQuery(limit?: number, offset?: number) {
-    if (limit === undefined || limit > 256 || limit <= 0) {
-      throw new BadRequestException({message: "Invalid limit", parameter: "limit"});
+  async getIssuersByQuery(limit: number, offset: number) {
+    if (limit > 256 || limit <= 0) {
+      throw new BadRequestException("Invalid limit value");
     }
-    if (offset === undefined || offset < 0) {
-      throw new BadRequestException({message: "Invalid offset", parameter: "offset"});
+    if (offset < 0) {
+      throw new BadRequestException("Invalid offset value");
     }
     const agent = this.agent;
     const issuerRepository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
@@ -42,10 +42,7 @@ export class IssuerService {
   async getIssuerByIssuerId(issuerId?: string) {
     if (!issuerId) {
       this.logger.error(`Missing required parameter issuerId`);
-      throw new BadRequestException({
-        message: "Missing required parameter",
-        parameter: "issuerId",
-      });
+      throw new BadRequestException("Missing issuerId parameter");
     }
     return await this.issuerApi.getIssuerByIssuerId(issuerId);
   }

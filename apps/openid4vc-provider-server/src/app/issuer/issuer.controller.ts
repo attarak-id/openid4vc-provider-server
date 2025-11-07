@@ -1,4 +1,15 @@
-import {Controller, Get, Post, Body, Param, Delete, Query, NotFoundException} from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+  NotFoundException,
+  ParseIntPipe,
+  DefaultValuePipe,
+} from "@nestjs/common";
 import {IssuerService} from "./issuer.service";
 import type {OpenId4VciCreateIssuerOptions} from "@credo-ts/openid4vc";
 import {RecordNotFoundError} from "@credo-ts/core";
@@ -8,7 +19,10 @@ export class IssuerController {
   constructor(private readonly issuerService: IssuerService) {}
 
   @Get("issuers")
-  public async getIssuersByQuery(@Query("limit") limit: number, @Query("offset") offset: number) {
+  public async getIssuersByQuery(
+    @Query("limit", new DefaultValuePipe(25), ParseIntPipe) limit: number,
+    @Query("offset", new DefaultValuePipe(0), ParseIntPipe) offset: number
+  ) {
     try {
       return this.issuerService.getIssuersByQuery(limit, offset);
     } catch (error) {

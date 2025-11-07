@@ -1,4 +1,14 @@
-import {Body, Controller, Get, NotFoundException, Param, Post, Query} from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from "@nestjs/common";
 import {VerifierService} from "./verifier.service";
 import {RecordNotFoundError} from "@credo-ts/core";
 
@@ -7,7 +17,10 @@ export class VerifierController {
   constructor(private readonly verifierService: VerifierService) {}
 
   @Get("verifiers")
-  async getVerifiersByQuery(@Query("limit") limit: number, @Query("offset") offset: number) {
+  async getVerifiersByQuery(
+    @Query("limit", new DefaultValuePipe(25), ParseIntPipe) limit: number,
+    @Query("offset", new DefaultValuePipe(0), ParseIntPipe) offset: number
+  ) {
     try {
       return this.verifierService.getVerifiersByQuery(limit, offset);
     } catch (error) {
@@ -16,7 +29,7 @@ export class VerifierController {
   }
 
   @Get(":id")
-  public async getVerifierByVerifierId(@Param("id") id: string) {
+  public async getVerifierByVerifierId(@Param("id") id?: string) {
     try {
       return await this.verifierService.getVerifierByVerifierId(id);
     } catch (error) {

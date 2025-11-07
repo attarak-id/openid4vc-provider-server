@@ -22,12 +22,12 @@ export class VerifierService {
 
   /** getAllVerifiers are not implemented cause get all can impact query performance if too many verifier record */
 
-  async getVerifiersByQuery(limit?: number, offset?: number) {
-    if (limit === undefined || limit > 256 || limit <= 0) {
-      throw new BadRequestException({message: "Invalid limit", parameter: "limit"});
+  async getVerifiersByQuery(limit: number, offset: number) {
+    if (limit > 256 || limit <= 0) {
+      throw new BadRequestException("Invalid limit value");
     }
-    if (offset === undefined || offset < 0) {
-      throw new BadRequestException({message: "Invalid offset", parameter: "offset"});
+    if (offset < 0) {
+      throw new BadRequestException("Invalid offset value");
     }
     const agent = this.agent;
     const verifierRepository = agent.dependencyManager.resolve(OpenId4VcVerifierRepository);
@@ -36,11 +36,8 @@ export class VerifierService {
   }
 
   async getVerifierByVerifierId(verifierId?: string) {
-    if (!verifierId) {
-      throw new BadRequestException({
-        message: "Missing required parameter",
-        parameter: "verifierId",
-      });
+    if (verifierId === undefined) {
+      throw new BadRequestException("Missing verifierId parameter");
     }
     return await this.verifierApi.getVerifierByVerifierId(verifierId);
   }
