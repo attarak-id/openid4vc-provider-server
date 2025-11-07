@@ -23,8 +23,17 @@ export class IssuerService {
   private get issuerApi(): OpenId4VcIssuerApi {
     return this.agent.modules.openId4VcIssuer;
   }
-
-  async getAllIssuers() {
+  
+  async getAllIssuers(page?: number, limit?: number) {
+    if (!page) {
+      page = 1;
+    }
+    if (!limit) {
+      limit = 20;
+    }
+    // if (page > n) exceed page limit
+    // if (limit > n) exceed limit per page
+    /** @TODO find solution to efficient query from storage. */
     return await this.issuerApi.getAllIssuers();
   }
 

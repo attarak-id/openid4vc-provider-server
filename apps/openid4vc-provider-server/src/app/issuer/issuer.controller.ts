@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Query,
-  NotFoundException,
-} from "@nestjs/common";
+import {Controller, Get, Post, Body, Param, Delete, Query, NotFoundException} from "@nestjs/common";
 import {IssuerService} from "./issuer.service";
 import type {OpenId4VciCreateIssuerOptions} from "@credo-ts/openid4vc";
 import {RecordNotFoundError} from "@credo-ts/core";
@@ -16,9 +7,13 @@ import {RecordNotFoundError} from "@credo-ts/core";
 export class IssuerController {
   constructor(private readonly issuerService: IssuerService) {}
 
-  @Get("get-all-issuers")
-  public async getAllIssuers() {
-    return this.issuerService.getAllIssuers();
+  /** FIX ME: it'should be pagination */
+  @Get("issuers")
+  public async getAllIssuers(
+    @Query("page") page: number,
+    @Query("limit") limit: number
+  ) {
+    return this.issuerService.getAllIssuers(page, limit);
   }
 
   @Get(":id")
@@ -109,4 +104,6 @@ export class IssuerController {
       throw error;
     }
   }
+
+  /** @TODO add other api */
 }

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Query,
-} from "@nestjs/common";
+import {Body, Controller, Get, NotFoundException, Param, Post, Query} from "@nestjs/common";
 import {VerifierService} from "./verifier.service";
 import {RecordNotFoundError} from "@credo-ts/core";
 
@@ -14,10 +6,11 @@ import {RecordNotFoundError} from "@credo-ts/core";
 export class VerifierController {
   constructor(private readonly verifierService: VerifierService) {}
 
-  @Get("get-all-verifiers")
-  async getAllVerifiers() {
+  /** FIX ME: it'should be pagination */
+  @Get("verifiers")
+  async getAllVerifiers(@Query("page") page: number, @Query("limit") limit: number) {
     try {
-      return this.verifierService.getAllVerifiers();
+      return this.verifierService.getAllVerifiers(page, limit);
     } catch (error) {
       throw error;
     }
@@ -55,4 +48,6 @@ export class VerifierController {
       throw error;
     }
   }
+
+  /** @TODO add other api */
 }

@@ -20,7 +20,16 @@ export class VerifierService {
     return this.agent.modules.openId4VcVerifier;
   }
 
-  async getAllVerifiers() {
+  async getAllVerifiers(page?:number, limit?:number) {
+    if (!page) {
+      page = 1;
+    }
+    if (!limit) {
+      limit = 20;
+    }
+    // if (page > n) exceed page limit
+    // if (limit > n) exceed limit per page
+    /** @TODO find solution to efficient query from storage. */
     return await this.verifierApi.getAllVerifiers();
   }
 
