@@ -6,11 +6,10 @@ import {RecordNotFoundError} from "@credo-ts/core";
 export class VerifierController {
   constructor(private readonly verifierService: VerifierService) {}
 
-  /** FIX ME: it'should be pagination */
   @Get("verifiers")
-  async getAllVerifiers(@Query("page") page: number, @Query("limit") limit: number) {
+  async getVerifiersByQuery(@Query("limit") limit: number, @Query("offset") offset: number) {
     try {
-      return this.verifierService.getAllVerifiers(page, limit);
+      return this.verifierService.getVerifiersByQuery(limit, offset);
     } catch (error) {
       throw error;
     }

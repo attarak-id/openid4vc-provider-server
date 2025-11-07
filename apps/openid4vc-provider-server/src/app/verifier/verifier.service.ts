@@ -20,17 +20,19 @@ export class VerifierService {
     return this.agent.modules.openId4VcVerifier;
   }
 
-  async getAllVerifiers(page?:number, limit?:number) {
-    if (!page) {
-      page = 1;
+  /** getAllVerifiers are not implemented cause get all can impact query performance if too many verifier record */
+
+  async getVerifiersByQuery(limit?: number, offset?: number) {
+    if (!limit || limit > 256 || limit <= 0) {
+      throw new BadRequestException({message: "Invalid limit", parameter: "limit"});
     }
-    if (!limit) {
-      limit = 20;
+    if (!offset || offset <= 0) {
+      throw new BadRequestException({message: "Invalid offset", parameter: "offset"});
     }
-    // if (page > n) exceed page limit
-    // if (limit > n) exceed limit per page
-    /** @TODO find solution to efficient query from storage. */
-    return await this.verifierApi.getAllVerifiers();
+    const agent = this.agent;
+    const verifierRepository = agent.dependencyManager.resolve(OpenId4VcVerifierRepository);
+    const verifierRecord = await verifierRepository.findByQuery(agent.context, {}, {limit: limit, offset: offset});
+    return verifierRecord;
   }
 
   async getVerifierByVerifierId(verifierId?: string) {

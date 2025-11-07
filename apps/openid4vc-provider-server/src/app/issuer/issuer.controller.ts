@@ -7,13 +7,13 @@ import {RecordNotFoundError} from "@credo-ts/core";
 export class IssuerController {
   constructor(private readonly issuerService: IssuerService) {}
 
-  /** FIX ME: it'should be pagination */
   @Get("issuers")
-  public async getAllIssuers(
-    @Query("page") page: number,
-    @Query("limit") limit: number
-  ) {
-    return this.issuerService.getAllIssuers(page, limit);
+  public async getIssuersByQuery(@Query("limit") limit: number, @Query("offset") offset: number) {
+    try {
+      return this.issuerService.getIssuersByQuery(limit, offset);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get(":id")
@@ -104,6 +104,15 @@ export class IssuerController {
       throw error;
     }
   }
+
+  // @Post("create-credential-offer")
+  // public async createCredentialOffer() {
+  //   try {
+  //     return this.issuerService.createCredentialOffer();
+  //   } catch (error) {
+  //     throw error
+  //   }
+  // }
 
   /** @TODO add other api */
 }

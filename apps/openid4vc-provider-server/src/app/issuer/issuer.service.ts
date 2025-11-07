@@ -23,18 +23,20 @@ export class IssuerService {
   private get issuerApi(): OpenId4VcIssuerApi {
     return this.agent.modules.openId4VcIssuer;
   }
-  
-  async getAllIssuers(page?: number, limit?: number) {
-    if (!page) {
-      page = 1;
+
+  /** getAllIssuers are not implemented cause get all can impact query performance if too many issuers record */
+
+  async getIssuersByQuery(limit?: number, offset?: number) {
+    if (!limit || limit > 256 || limit <= 0) {
+      throw new BadRequestException({message: "Invalid limit", parameter: "limit"});
     }
-    if (!limit) {
-      limit = 20;
+    if (!offset || offset <= 0) {
+      throw new BadRequestException({message: "Invalid offset", parameter: "offset"});
     }
-    // if (page > n) exceed page limit
-    // if (limit > n) exceed limit per page
-    /** @TODO find solution to efficient query from storage. */
-    return await this.issuerApi.getAllIssuers();
+    const agent = this.agent;
+    const issuerRepository = agent.dependencyManager.resolve(OpenId4VcIssuerRepository);
+    const issuerRecord = await issuerRepository.findByQuery(agent.context, {}, {limit: limit, offset: offset});
+    return issuerRecord;
   }
 
   async getIssuerByIssuerId(issuerId?: string) {
