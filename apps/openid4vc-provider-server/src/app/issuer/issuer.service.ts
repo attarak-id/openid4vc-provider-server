@@ -27,10 +27,10 @@ export class IssuerService {
   /** getAllIssuers are not implemented cause get all can impact query performance if too many issuers record */
 
   async getIssuersByQuery(limit?: number, offset?: number) {
-    if (!limit || limit > 256 || limit <= 0) {
+    if (limit === undefined || limit > 256 || limit <= 0) {
       throw new BadRequestException({message: "Invalid limit", parameter: "limit"});
     }
-    if (!offset || offset <= 0) {
+    if (offset === undefined || offset < 0) {
       throw new BadRequestException({message: "Invalid offset", parameter: "offset"});
     }
     const agent = this.agent;
