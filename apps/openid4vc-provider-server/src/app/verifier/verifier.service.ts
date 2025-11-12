@@ -2,6 +2,7 @@ import {BadRequestException, ConflictException, Injectable, Logger, NotImplement
 import {AgentService} from "../agent/agent.service";
 import type {Agent} from "@credo-ts/core";
 import {
+  OpenId4VcSiopAuthorizationResponsePayload,
   OpenId4VcVerifierRepository,
   type OpenId4VcSiopCreateAuthorizationRequestOptions,
   type OpenId4VcSiopVerifyAuthorizationResponseOptions,
@@ -70,6 +71,20 @@ export class VerifierService {
     }
   ) {
     return await this.verifierApi.verifyAuthorizationResponse(verifyAuthorizationResponseOptions);
+  }
+
+  async getVerifiedAuthorizationResponse(verficationSessionId: string) {
+    return await this.verifierApi.getVerifiedAuthorizationResponse(verficationSessionId);
+  }
+
+  async findVerificationSessionForAuthorizationResponse(
+    authorizationResponse: OpenId4VcSiopAuthorizationResponsePayload,
+    verfierId?: string
+  ) {
+    return await this.verifierApi.findVerificationSessionForAuthorizationResponse({
+      authorizationResponse: authorizationResponse,
+      verifierId: verfierId,
+    });
   }
 
   /** @TODO implementing in @credo-ts/openid4vc 0.6.x */
