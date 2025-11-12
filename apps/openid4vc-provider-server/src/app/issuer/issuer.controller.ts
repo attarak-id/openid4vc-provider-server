@@ -119,14 +119,45 @@ export class IssuerController {
     }
   }
 
-  // @Post("create-credential-offer")
-  // public async createCredentialOffer() {
-  //   try {
-  //     return this.issuerService.createCredentialOffer();
-  //   } catch (error) {
-  //     throw error
-  //   }
-  // }
+  /** @TODO type-strict. */
+  @Post("create-credential-offer")
+  public async createCredentialOffer(@Body() id: string, @Body() options: any) {
+    try {
+      return this.issuerService.createCredentialOffer(id, options);
+    } catch (error) {
+      throw error;
+    }
+  }
 
+  /** @TODO type-strict */
+  @Post("create-credential-response")
+  public async createCredentialResponse(@Body() id: string, @Body() options: any) {
+    try {
+      return this.issuerService.createCredentialResponse(id, options);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get()
+  public async findIssuanceSessionForCredentialRequest(@Body() id: string, @Body() options: any) {
+    try {
+      return this.issuerService.findIssuanceSessionForCredentialRequest(options, id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get(":issuanceSessionId")
+  public async findIssuanceSessionById(@Param("issuanceSessionId") id: string) {
+    try {
+      return await this.issuerService.findIssuanceSessionById(id);
+    } catch (error) {
+      if (error instanceof RecordNotFoundError) {
+        throw new NotFoundException(`issuanceSessionId:${id} not found`);
+      }
+      throw error;
+    }
+  }
   /** @TODO add other api */
 }

@@ -1,6 +1,9 @@
 import {BadRequestException, ConflictException, Injectable, Logger, NotFoundException} from "@nestjs/common";
 import {AgentService} from "../agent/agent.service";
-import {OpenId4VcIssuerRepository} from "@credo-ts/openid4vc/build/openid4vc-issuer/repository";
+import {
+  OpenId4VcIssuanceSessionRepository,
+  OpenId4VcIssuerRepository,
+} from "@credo-ts/openid4vc/build/openid4vc-issuer/repository";
 import type {Agent} from "@credo-ts/core";
 import type {
   OpenId4VciCreateCredentialOfferOptions,
@@ -112,5 +115,13 @@ export class IssuerService {
       issuanceSessionId: issuanceSessionId,
       ...options,
     });
+  }
+
+  /** @TODO session can be refactor into issuanceSessionService and use in issuanceSessionController */
+
+  async findIssuanceSessionById(IssuanceSessionId: string) {
+    const agent = this.agent;
+    const issuanceSessionRepository = agent.dependencyManager.resolve(OpenId4VcIssuanceSessionRepository);
+    return await issuanceSessionRepository.findById(agent.context, IssuanceSessionId);
   }
 }
